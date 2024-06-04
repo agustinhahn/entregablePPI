@@ -1,21 +1,21 @@
 const socket = io();
 
-let username = null;
+let user = null;
 
-if (!username) {
+if (!user) {
     Swal.fire({
         title: "¡Welcome to chat!",
-        input: "Insert your username:",
+        input: "Insert your user:",
         input: "text",
         showCancelButton: true,
         inputValidator: (value) => {
             if (!value) {
-                return "Your username is required";
+                return "Your user is required";
             }
         }
     }).then((input) => {
-        username = input.value;
-        socket.emit('newUser', username);
+        user = input.value;
+        socket.emit('newUser', user);
     })
 }
 
@@ -26,24 +26,25 @@ const actions = document.getElementById('actions');
 
 btn.addEventListener('click', () => {
     socket.emit('chat:message', {
-        username,
+        user,
         message: message.value
     })
     message.value = '';
 })
 
 socket.on('messages', (data) => {
+    console.log(data)
     actions.innerHTML = ''
     const chatRender = data.map((msg) => {
-        return `<p><strong>${msg.username}</strong>: ${msg.message}</p>`
+        return `<p><strong>${msg.user}</strong>: ${msg.message}</p>`
     }).join(' ')
 
     output.innerHTML = chatRender
 })
 
-socket.on('newUser', (username) => {
+socket.on('newUser', (user) => {
     Toastify({
-        text: `${username} is logged in`,
+        text: `${user} is logged in`,
         duration: 3000,
         // destination: "https://github.com/apvarun/toastify-js",
         // newWindow: true,
@@ -59,7 +60,7 @@ socket.on('newUser', (username) => {
 })
 
 message.addEventListener('keypress', () => {
-    socket.emit('chat:typing', username)
+    socket.emit('chat:typing', user)
 })
 
 socket.on('chat:typing', (data) => {

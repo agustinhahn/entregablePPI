@@ -7,10 +7,11 @@ import cartsRouter from "./routes/cart.router.js"
 import { Server } from "socket.io"
 import { __dirname } from "./utils.js"
 import handlebars from "express-handlebars"
+import messageRouter from "./routes/message.router.js"
+import MessageDaoMongoDB from './daos/mongodb/message.dao.js'
 const app = express()
 
-
-
+const messageDaoMongoDB = new MessageDaoMongoDB()
 
 //statics
 app.use(express.static(__dirname + "/public"));
@@ -30,8 +31,7 @@ app.set("views", __dirname + "/views");
 
 app.use('/products', productsRouter)
 app.use('/carts', cartsRouter)
-app.use('/chat', )
-// app.use('/message', messageRouter)
+app.use('/message', messageRouter)
 
 if(process.env.PERSISTENCE === 'MONGO') initMongoDB()
 
@@ -44,26 +44,25 @@ const httpServer = app.listen(PORT, () => {
 //ejecuto server IO
 const socketServer = new Server(httpServer);
 
-socketServer.on('connection', (socket) => {
-    console.log(`Usuario conectado: ${socket.id}`);
+socketServer.on('connection', async(socket) => {
+    console.log('🟢 ¡New connection!', socket.id);
+    socketServer.emit('messages', await messageDaoMongoDB.getAll());   //emite a todos los clientes
 
-    socket.on('disconnect', () => {
-        console.log('Usuario desconectado');
+    socket.on('disconnect', ()=>{
+        console.log('🔴 User disconnect', socket.id);
     })
 
-    socket.emit('saludoDesdeBack', 'Bienvenido a websockets')
-
-    socket.on('getProducts', async (message) => {
-        console.log(message);
-        socket.emit('allProducts', await productManager.getProducts())
+    socket.on('newUser', (user)=>{
+        console.log(`> ${user} ha iniciado sesión`);
+        socket.broadcast.emit('newUser', user);
     })
 
-    socket.on('newProduct', async (prod) => {
-        await productManager.addProduct(prod)
-        socketServer.emit('products', await productManager.getProducts());
+    socket.on('chat:message', async(msg)=>{
+        await messageDaoMongoDB.create(msg);
+        socketServer.emit('messages', await messageDaoMongoDB.getAll());   //emite a todos los clientes
     })
 
-    socket.on('deleteProduct', async(id)=>{
-        await productManager.deleteProduct(id)
+    socket.on('chat:typing', (data)=>{
+        socket.broadcast.emit('chat:typing', data)
     })
 })
