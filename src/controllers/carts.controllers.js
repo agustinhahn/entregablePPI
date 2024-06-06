@@ -1,18 +1,18 @@
+import * as services from "../services/carts.services.js"
 
-
-export const getAll = async(req,res,next)=>{
+export const getCarts = async(req,res,next)=>{
     try {
-        const response = await services.getAll()
+        const response = await services.getCarts()
         res.status(200).json(response)
     } catch (error) {
         console.error(error)
     }
 }
 
-export const getById = async(req,res,next)=>{
+export const getCartByCid = async(req,res,next)=>{
     try {
-        const {id} = req.params
-        const response = await services.getById(id)
+        const {cid} = req.params
+        const response = await services.getCartByCid(cid)
         if(!response) res.status(404).json({msg:"cart not found"})
         else res.json(response)
     } catch (error) {
@@ -20,9 +20,10 @@ export const getById = async(req,res,next)=>{
     }
 }
 
-export const create = async(req,res,next)=>{
+export const addCart = async(req,res,next)=>{
     try {
-        const response = await services.create(obj)
+        const {pid} = req.params
+        const response = await services.addCart(pid)
         if(!response) res.status(404).json({msg:"cart not create"})
         else res.status(200).json(response)
     } catch (error) {
@@ -30,10 +31,11 @@ export const create = async(req,res,next)=>{
     }
 }
 
-export const update = async(req,res,next)=>{
+export const updateCart = async(req,res,next)=>{
     try {
-        const {id} = req.params
-        const response = await services.update(id,req.body);
+        const {cid} = req.params
+        const {pid} = req.params
+        const response = await services.updateCart(cid,pid);
         if(!response) res.status(404).json({msg:"cart not update"})
         else res.status(200).json(response)
         } catch (error) {
@@ -43,8 +45,8 @@ export const update = async(req,res,next)=>{
 
 export const remove = async(req,res,next)=>{
     try {
-        const {id} = req.params
-        const response = await services.remove(id)
+        const {cid} = req.params
+        const response = await services.remove(cid)
         if(!response) res.status(404).json({msg:"cart not remove"})
         else res.status(200).json(response)
     } catch (error) {

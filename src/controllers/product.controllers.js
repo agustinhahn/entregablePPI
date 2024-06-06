@@ -5,6 +5,7 @@ export const getAll = async(req,res,next) =>{
         const response = await services.getAll();
         const plainResponse = response.map(p => p.toObject())
         res.render('home', {response:plainResponse})
+        // res.json(plainResponse)
     } catch (error) {
         next(error.message);
     }

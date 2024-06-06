@@ -1,6 +1,7 @@
 //configuracion para MONGODB
 import CartDaoMongoDB from "../daos/mongodb/cart.dao.js"
-const cartDao = new ProductDaoMongoDB()
+const cartDao = new CartDaoMongoDB()
+
 
 //configuracion para filesystem
 
@@ -8,40 +9,40 @@ const cartDao = new ProductDaoMongoDB()
 // import ProductDaoFS from "../daos/filesystem/cart.dao.js"
 // const cartDao = new ProductDaoFS()
 
-export const getAll = async()=>{
+export const getCarts = async()=>{
     try {
-        return await cartDao.getAll()
+        return await cartDao.getCarts()
     } catch (error) {
         throw new Error(error)
     }
 }
 
-export const getById = async(id)=>{
+export const getCartByCid = async(cid)=>{
     try {
-        return await cartDao.getById(id)
+        return await cartDao.getCartByCid(cid)
     } catch (error) {
         throw new Error(error)
     }
 }
 
-export const create = async(obj)=>{
+export const addCart = async(pid)=>{
     try {
-        return await cartDao.create(obj)
+        return await cartDao.addCart(pid)
     } catch (error) {
         throw new Error(error)
     }
 }
 
-export const update = async(id,obj)=>{
+export const updateCart = async(cid,pid)=>{
     try {
-        return await cartDao.update(id,obj)
+        return await cartDao.update(cid,pid)
     } catch (error) {
         throw new Error(error)
     }
 }
-export const remove = async(id)=>{
+export const remove = async(cid)=>{
     try {
-        return await cartDao.remove(id)
+        return await cartDao.remove(cid)
     } catch (error) {
         throw new Error(error)
     }
